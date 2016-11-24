@@ -29,7 +29,16 @@
 		let canvas = document.getElementById('canvas'),
    	context = canvas.getContext('2d');
    	let targetPos = {x:0, y:0};
-   	let objPos = {x:0, y: 0};
+
+   	let pacman = {
+   		x: 0,
+   		y: 0,
+   		radius: 60,
+   		radiant: 1,
+   		time: 80
+   	}
+
+   	let tick = 0;
 
     window.addEventListener('resize', resizeCanvas, false);
 		
@@ -51,19 +60,27 @@
       canvas.height = window.innerHeight;     
     }
 
-    function updateObjPosition() {
-    	if(objPos.x != targetPos.x) 
-				objPos.x += objPos.x < targetPos.x ? 1 : -1;
-			if(objPos.y != targetPos.y)
-    		objPos.y += objPos.y < targetPos.y ? 1 : -1;
+    function updatePacmanPosition() {
+    	if(pacman.x != targetPos.x) 
+				pacman.x += pacman.x < targetPos.x ? 1 : -1;
+			if(pacman.y != targetPos.y)
+    		pacman.y += pacman.y < targetPos.y ? 1 : -1;
+    }
+
+    function updateTick() {
+    	tick += tick < pacman.time ? 1 : -tick;
     }
 
     function drawStuff() {
     	canvas.width = canvas.width;
 			context.beginPath();
     	context.fillStyle = 'yellow';
-    	context.fillRect(objPos.x - 50, objPos.y - 50, 100, 100);
-    	updateObjPosition();
+			let proportion = -Math.cos( tick / pacman.time * 2 * Math.PI ) / 2 + .5;
+			context.moveTo(pacman.x, pacman.y);
+    	context.arc(pacman.x, pacman.y, pacman.radius, pacman.radiant * proportion, Math.PI * 2 - pacman.radiant * proportion);
+    	context.fill();
+    	updatePacmanPosition();
+    	updateTick();
 		}
 
 		resizeCanvas();  
