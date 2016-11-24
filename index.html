@@ -28,10 +28,26 @@
 	<script type="text/javascript">
 		let canvas = document.getElementById('canvas'),
    	context = canvas.getContext('2d');
+   	let x = 0;
+   	let y = 0;
 
     window.addEventListener('resize', resizeCanvas, false);
+		
+		canvas.addEventListener('mousemove', function(e) {
+        let mousePos = getMousePos(canvas, e);
+        x = mousePos.x;
+        y = mousePos.y;
+        drawStuff();
+    }, false);
 
-   
+   function getMousePos(canvas, e) {
+      let rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;     
@@ -40,9 +56,13 @@
 
     resizeCanvas();
 
+
     function drawStuff() {
+    	canvas.width = canvas.width;
+			context.beginPath();
+
     	context.fillStyle = 'green';
-    	context.fillRect(0, 0, 100, 100);
+    	context.fillRect(x, y, 100, 100);
 		}
 
 	</script>
