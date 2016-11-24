@@ -28,16 +28,14 @@
 	<script type="text/javascript">
 		let canvas = document.getElementById('canvas'),
    	context = canvas.getContext('2d');
-   	let x = 0;
-   	let y = 0;
+   	let targetPos = {x:0, y:0};
+   	let objPos = {x:0, y: 0};
 
     window.addEventListener('resize', resizeCanvas, false);
 		
 		canvas.addEventListener('mousemove', function(e) {
-        let mousePos = getMousePos(canvas, e);
-        x = mousePos.x;
-        y = mousePos.y;
-        drawStuff();
+        targetPos = getMousePos(canvas, e);
+
     }, false);
 
    function getMousePos(canvas, e) {
@@ -51,19 +49,27 @@
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;     
-      drawStuff(); 
     }
 
-    resizeCanvas();
-
+    function updateObjPosition() {
+    	if(objPos.x != targetPos.x) 
+				objPos.x += objPos.x < targetPos.x ? 1 : -1;
+			if(objPos.y != targetPos.y)
+    		objPos.y += objPos.y < targetPos.y ? 1 : -1;
+    }
 
     function drawStuff() {
     	canvas.width = canvas.width;
 			context.beginPath();
-
-    	context.fillStyle = 'green';
-    	context.fillRect(x, y, 100, 100);
+    	context.fillStyle = 'yellow';
+    	context.fillRect(objPos.x - 50, objPos.y - 50, 100, 100);
+    	updateObjPosition();
 		}
+
+		resizeCanvas();  
+    setInterval(() => {
+		 drawStuff(); 
+		}, 1);
 
 	</script>
 </body>
