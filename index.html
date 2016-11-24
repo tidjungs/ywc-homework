@@ -30,12 +30,24 @@
    	context = canvas.getContext('2d');
    	let targetPos = {x:0, y:0};
 
+   	const DIRECTION = {
+   		leftDown: -2.25,
+   		down: -1.5,
+   		rightDown: 0.75,
+   		left: 0,
+   		rightUp: -0.75,
+   		up: 1.5,
+   		leftUp: 2.25,
+   		right: 3,
+   	}
+
    	let pacman = {
    		x: 0,
    		y: 0,
-   		radius: 60,
+   		radius: 40,
    		radiant: 1,
-   		time: 80
+   		time: 80,
+   		dir: DIRECTION.left
    	}
 
    	let tick = 0;
@@ -60,10 +72,36 @@
       canvas.height = window.innerHeight;     
     }
 
+    function updatePacmanDirection() {
+    	if (pacman.x == targetPos.x) {
+    		if (pacman.y < targetPos.y) {
+    			pacman.dir = DIRECTION.up;
+    		} else if (pacman.y > targetPos.y) {
+    			pacman.dir = DIRECTION.down;
+    		}
+    	} else if (pacman.y == targetPos.y) {
+    		if (pacman.x < targetPos.x) {
+    			pacman.dir = DIRECTION.left;
+    		} else if (pacman.x > targetPos.x) {
+    			pacman.dir = DIRECTION.right;
+    		}
+    	} else {
+    		if (pacman.x < targetPos.x && pacman.y < targetPos.y) {
+    			pacman.dir = DIRECTION.rightDown;
+    		} else if (pacman.x < targetPos.x && pacman.y > targetPos.y) {
+    			pacman.dir = DIRECTION.rightUp;
+    		} else if (pacman.x > targetPos.x && pacman.y < targetPos.y) {
+    			pacman.dir = DIRECTION.leftUp;
+    		} else if (pacman.x > targetPos.x && pacman.y > targetPos.y) {
+    			pacman.dir = DIRECTION.leftDown;
+    		}
+    	}
+    }
+
     function updatePacmanPosition() {
-    	if(pacman.x != targetPos.x) 
+    	if (pacman.x != targetPos.x) 
 				pacman.x += pacman.x < targetPos.x ? 1 : -1;
-			if(pacman.y != targetPos.y)
+			if (pacman.y != targetPos.y)
     		pacman.y += pacman.y < targetPos.y ? 1 : -1;
     }
 
@@ -77,9 +115,10 @@
     	context.fillStyle = 'yellow';
 			let proportion = -Math.cos( tick / pacman.time * 2 * Math.PI ) / 2 + .5;
 			context.moveTo(pacman.x, pacman.y);
-    	context.arc(pacman.x, pacman.y, pacman.radius, pacman.radiant * proportion, Math.PI * 2 - pacman.radiant * proportion);
+    	context.arc(pacman.x, pacman.y, pacman.radius, pacman.radiant * proportion + pacman.dir, Math.PI * 2 - pacman.radiant * proportion + pacman.dir);
     	context.fill();
     	updatePacmanPosition();
+    	updatePacmanDirection();
     	updateTick();
 		}
 
