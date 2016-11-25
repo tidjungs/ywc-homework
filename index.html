@@ -30,6 +30,10 @@
    	context = canvas.getContext('2d');
    	var targetPos = {x:0, y:0};
     var tick = 0;
+    var pointsColor = [];
+    var showColor = []
+    var counter = 0;
+    var spawnTime = 1200;
 
    	var DIRECTION = {
    		leftDown: -2.25,
@@ -50,7 +54,8 @@
    		time: 80,
    		dir: DIRECTION.left,
    		color: 'hsl(40,80%,63%)',
-      speed: 4
+      speed: 4,
+      eat: 0
    	}
 
     var points = [
@@ -132,6 +137,7 @@
       if ((pacman.x >= posX - pacman.radius && pacman.x <= posX + pacman.radius) 
         && (pacman.y >= posY - pacman.radius && pacman.y <= posY + pacman.radius)) {
         points[y] = points[y].substr(0, x) + '0' + points[y].substr(x + 1);
+        pacman.eat++;
       }
     }
 
@@ -141,11 +147,6 @@
         Math.floor(Math.random() * 256) + ',' + 
         Math.floor(Math.random() * 256) + ')';
     }
-
-
-    var pointsColor = [];
-    var showColor = []
-    var counter = 0;
 
     function renderPoint() {
 
@@ -182,9 +183,38 @@
     	context.fillStyle = pacman.color;
 			var proportion = -Math.cos( tick / pacman.time * 2 * Math.PI ) / 2 + .5;
 			context.moveTo(pacman.x, pacman.y);
-      pacman.radius = canvas.width / 30;
+      pacman.radius = canvas.width / 30 + pacman.eat*0.2;
     	context.arc(pacman.x, pacman.y, pacman.radius, pacman.radiant * proportion + pacman.dir, Math.PI * 2 - pacman.radiant * proportion + pacman.dir);
     	context.fill();
+    }
+
+    function checkRespawn() {
+      if (--spawnTime === 0) {
+        spawnTime = 1200;
+        points = [
+          "10000000101000000010000000100111111110000",
+          "01000001001000000010000000101000000001000",
+          "00100010000100000101000001001000000001000",
+          "00010100000100000101000001001000000000000",
+          "00001000000010001000100010001000000000000",
+          "00001000000010001000100010001000000000000",
+          "00001000000001010000010100001000000000000",
+          "00001000000001010000010100001000000001000",
+          "00001000000000100000001000001000000001000",
+          "00001000000000100000001000000111111110000"
+        ];
+
+        for (var i=0; i<points.length; i++) {
+          pointsColor[i] = randomColor();
+        }
+      }
+    }
+
+    function renderTime() {
+      context.beginPath();
+      context.font = '40px Open Sans sans-serif';
+      context.fillStyle = 'white'
+      context.fillText('Respawn in '+ Math.floor(spawnTime / 20), 20, 50);
     }
 
     function render() {
@@ -192,12 +222,12 @@
     	canvas.width = canvas.width;
 			context.beginPath();
 			renderPoint();
-
+      renderTime();
       renderPacman();
     	updatePacmanPosition();
     	updatePacmanDirection();
-
     	updateTick();
+      checkRespawn();
 		}
 
 		resizeCanvas();  
