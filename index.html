@@ -66,6 +66,8 @@
       "00001000000000100000001000000111111110000"
     ];
 
+    var changeColorTime = 1;
+
     window.addEventListener('resize', resizeCanvas, false);
 		
 		canvas.addEventListener('mousemove', function(e) {
@@ -133,24 +135,43 @@
       }
     }
 
+    function randomColor () {
+      return 'rgb(' + 
+        Math.floor(Math.random() * 256) + ',' + 
+        Math.floor(Math.random() * 256) + ',' + 
+        Math.floor(Math.random() * 256) + ')';
+    }
+
+
+    var pointsColor = [];
+    var showColor = []
+    var counter = 0;
+
     function renderPoint() {
+
       for (var y=0; y<points.length; y++) {
+
+        context.fillStyle = pointsColor[showColor[y]];
+
         for (var x=0; x<points[y].length; x++) {
           
-          if (points[y][x] == '1') {
-            context.fillStyle = 'yellow';
+          if (points[y][x] === '1') {
 
             var spawnX = 15 +  canvas.width / 40 * x;
             var spawnY = 180 + canvas.width / 40 * y;
-            var size = canvas.width / 120;
-
-            context.fillRect(spawnX, spawnY, size, size);
+            var size = canvas.width / 100;
             
+            context.fillRect(spawnX, spawnY, size, size);
+
             eatPoint(x, y, spawnX, spawnY);
 
           }
         }
       }
+
+      showColor[counter] += showColor[counter] < pointsColor.length - 1 ? 1 : -showColor[counter];
+      counter += counter < pointsColor.length - 1 ? 1 : -counter;        
+
     }
 
     function updateTick() {
@@ -181,6 +202,14 @@
 
 		resizeCanvas();  
     render();
+
+    for (var i=0; i<points.length; i++) {
+      pointsColor.push(randomColor());
+    }
+
+    showColor = pointsColor.map(function () {
+      return 0;
+    });
 
 	</script>
 </body>
