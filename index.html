@@ -66,8 +66,6 @@
       "00001000000000100000001000000111111110000"
     ];
 
-
-
     window.addEventListener('resize', resizeCanvas, false);
 		
 		canvas.addEventListener('mousemove', function(e) {
@@ -85,7 +83,7 @@
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;     
+      canvas.height = window.innerHeight;
     }
 
     function updatePacmanDirection() {
@@ -128,15 +126,29 @@
       }
     }
 
+    function eatPoint(x, y, posX, posY) {
+      if ((pacman.x >= posX - pacman.radius && pacman.x <= posX + pacman.radius) 
+        && (pacman.y >= posY - pacman.radius && pacman.y <= posY + pacman.radius)) {
+        points[y] = points[y].substr(0, x) + '0' + points[y].substr(x + 1);
+      }
+    }
+
     function renderPoint() {
       for (var y=0; y<points.length; y++) {
         for (var x=0; x<points[y].length; x++) {
           
           if (points[y][x] == '1') {
             context.fillStyle = 'yellow';
-            context.fillRect(15 +  canvas.width / 40*x, 180 + canvas.width / 40*y, canvas.width / 100, canvas.width / 100);
-          }
 
+            var spawnX = 15 +  canvas.width / 40 * x;
+            var spawnY = 180 + canvas.width / 40 * y;
+            var size = canvas.width / 120;
+
+            context.fillRect(spawnX, spawnY, size, size);
+            
+            eatPoint(x, y, spawnX, spawnY);
+
+          }
         }
       }
     }
