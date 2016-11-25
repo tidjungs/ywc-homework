@@ -5,7 +5,7 @@
 	<title>Document</title>
 </head>
 <body>
-	<canvas id="canvas"></canvas>
+	<canvas id="myCanvas"></canvas>
 	
 	<style type="text/css">
 		* {
@@ -18,7 +18,7 @@
 			height: 100%;
 		}
 
-		#canvas {
+		#myCanvas {
 			background-color: black;
 			display: block;
 			width: 100%;
@@ -26,11 +26,12 @@
 	</style>
 
 	<script type="text/javascript">
-		let canvas = document.getElementById('canvas'),
+		var canvas = document.getElementById("myCanvas");
    	context = canvas.getContext('2d');
-   	let targetPos = {x:0, y:0};
+   	var targetPos = {x:0, y:0};
+    var tick = 0;
 
-   	const DIRECTION = {
+   	var DIRECTION = {
    		leftDown: -2.25,
    		down: -1.5,
    		rightDown: 0.75,
@@ -41,26 +42,41 @@
    		right: 3,
    	}
 
-   	let pacman = {
+   	var pacman = {
    		x: 0,
    		y: 0,
    		radius: 40,
    		radiant: 1,
    		time: 80,
-   		dir: DIRECTION.left
+   		dir: DIRECTION.left,
+   		color: 'hsl(40,80%,63%)',
+      speed: 4
    	}
 
-   	let tick = 0;
+    var points = [
+      "10000000101000000010000000100111111110000",
+      "01000001001000000010000000101000000001000",
+      "00100010000100000101000001001000000001000",
+      "00010100000100000101000001001000000000000",
+      "00001000000010001000100010001000000000000",
+      "00001000000010001000100010001000000000000",
+      "00001000000001010000010100001000000000000",
+      "00001000000001010000010100001000000001000",
+      "00001000000000100000001000001000000001000",
+      "00001000000000100000001000000111111110000"
+    ];
+
+
 
     window.addEventListener('resize', resizeCanvas, false);
 		
 		canvas.addEventListener('mousemove', function(e) {
-        targetPos = getMousePos(canvas, e);
+      targetPos = getMousePos(canvas, e);
 
     }, false);
 
    function getMousePos(canvas, e) {
-      let rect = canvas.getBoundingClientRect();
+      var rect = canvas.getBoundingClientRect();
       return {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
@@ -99,33 +115,60 @@
     }
 
     function updatePacmanPosition() {
-    	if (pacman.x != targetPos.x) 
-				pacman.x += pacman.x < targetPos.x ? 1 : -1;
-			if (pacman.y != targetPos.y)
-    		pacman.y += pacman.y < targetPos.y ? 1 : -1;
+    	if (pacman.x < targetPos.x - pacman.speed || pacman.x > targetPos.x + pacman.speed ) {
+				pacman.x += pacman.x < targetPos.x ? pacman.speed : -pacman.speed;
+      } else if (pacman.x != targetPos.x) {
+        pacman.x += pacman.x < targetPos.x ? 1 : -1;
+      }
+
+			if (pacman.y < targetPos.y - pacman.speed || pacman.y > targetPos.y + pacman.speed) {
+    		pacman.y += pacman.y < targetPos.y ? pacman.speed : -pacman.speed;
+      } else if (pacman.y != targetPos.y) {
+        pacman.y += pacman.y < targetPos.y ? 1 : -1;
+      }
+    }
+
+    function renderPoint() {
+      for (var y=0; y<points.length; y++) {
+        for (var x=0; x<points[y].length; x++) {
+          
+          if (points[y][x] == '1') {
+            context.fillStyle = 'yellow';
+            context.fillRect(15 +  canvas.width / 40*x, 180 + canvas.width / 40*y, canvas.width / 100, canvas.width / 100);
+          }
+
+        }
+      }
     }
 
     function updateTick() {
-    	tick += tick < pacman.time ? 1 : -tick;
+    	tick += tick < pacman.time ? 3 : -tick;
     }
 
-    function drawStuff() {
-    	canvas.width = canvas.width;
-			context.beginPath();
-    	context.fillStyle = 'yellow';
-			let proportion = -Math.cos( tick / pacman.time * 2 * Math.PI ) / 2 + .5;
+    function renderPacman() {
+    	context.fillStyle = pacman.color;
+			var proportion = -Math.cos( tick / pacman.time * 2 * Math.PI ) / 2 + .5;
 			context.moveTo(pacman.x, pacman.y);
+      pacman.radius = canvas.width / 30;
     	context.arc(pacman.x, pacman.y, pacman.radius, pacman.radiant * proportion + pacman.dir, Math.PI * 2 - pacman.radiant * proportion + pacman.dir);
     	context.fill();
+    }
+
+    function render() {
+      window.requestAnimationFrame(render);
+    	canvas.width = canvas.width;
+			context.beginPath();
+			renderPoint();
+
+      renderPacman();
     	updatePacmanPosition();
     	updatePacmanDirection();
+
     	updateTick();
 		}
 
 		resizeCanvas();  
-    setInterval(() => {
-		 drawStuff(); 
-		}, 1);
+    render();
 
 	</script>
 </body>
